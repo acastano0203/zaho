@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Manrope", system-ui, sans-serif;
+  --font-display: "Michroma", sans-serif;
+
+  --color-ink: #2B2826;
+  --color-char: #3E3A38;
+  --color-taupe: #57524F;
+  --color-stone: #8A837C;
+  --color-sand-dark: #B3AAA0;
+  --color-fog: #BDB5AA;
+  --color-sand: #D7CFC3;
+  --color-linen: #E8E2D9;
+  --color-line: #F1ECE5;
+  --color-cream: #F3EFE9;
+  --color-mist: #F7F4EF;
+  --color-paper: #FBF9F6;
+  --color-ok: #7A8B6F;
+  --color-warn: #C29A4B;
+  --color-bad: #A65A4A;
+  --color-util: #4F5E46;
+  --color-gold: #C29A4B;
+}
+
+@layer base {
+  html, body, #root { min-height: 100%; }
+  body {
+    @apply bg-white font-sans text-[14px] leading-snug text-char antialiased;
+  }
+  button { cursor: pointer; }
+  button:disabled { cursor: not-allowed; }
+  :focus-visible { outline: 2px solid var(--color-gold); outline-offset: 2px; }
+}
+
+@utility tabular { font-variant-numeric: tabular-nums; }
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
