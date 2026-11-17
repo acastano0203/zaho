@@ -2,6 +2,7 @@ import { useEffect, type ReactNode } from 'react'
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AppStoreProvider, useApp } from './store/AppStore'
 import { Button } from './components/ui/Button'
+import { missingConfig } from '../config/env'
 import { UIProvider } from './store/UIStore'
 import { SessionProvider, useSession } from './store/SessionStore'
 import { AppLayout } from './components/layout/AppLayout'
@@ -90,7 +91,23 @@ function LoggedIn() {
   )
 }
 
+/** Versión publicada sin las variables de Supabase: no se abre nada */
+function ConfigError({ faltan }: { faltan: string[] }) {
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-mist px-6 text-center text-ink">
+      <LogoMark stroke="#3E3A38" width={40} height={46} />
+      <h1 className="text-lg">Falta configurar la conexión con la base de datos</h1>
+      <p className="max-w-md text-[13px] text-char">
+        El servidor donde está publicada la app no tiene estas variables: <b>{faltan.join(', ')}</b>.
+        Agrégalas en la configuración del hosting y vuelve a desplegar.
+      </p>
+    </div>
+  )
+}
+
 export default function App() {
+  const faltan = missingConfig()
+  if (faltan.length) return <ConfigError faltan={faltan} />
   return (
     <AppStoreProvider>
       <SessionProvider>
