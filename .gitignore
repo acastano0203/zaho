@@ -1,3 +1,42 @@
+# Dependencias y compilados
 node_modules
 dist
+dist-ssr
+*.tsbuildinfo
+
+# Variables de entorno: claves y URLs reales (NUNCA se suben)
+# Se sube solo .env.example como plantilla, sin valores reales
+.env
+.env.*
+!.env.example
 *.local
+
+# Supabase CLI: proyecto vinculado y archivos temporales de tu equipo
+supabase/.temp/
+supabase/.branches/
+supabase/.env
+supabase/functions/.env
+supabase/functions/**/.env
+
+# Registros
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editor y sistema operativo
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+Thumbs.db
+desktop.ini
+*.suo
+*.sw?
+
+# Archivos de pruebas y caché
+coverage
+.cache
+.eslintcache

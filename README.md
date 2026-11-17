@@ -1,7 +1,7 @@
 # ZAHO · Inventario
 
 App de inventario, ventas, cartera y salidas para una tienda multimarca.
-React + Vite + TypeScript + Tailwind CSS v4 + React Router. Sin backend: los datos son simulados.
+React + Vite + TypeScript + Tailwind CSS v4 + React Router. Modo demo con datos simulados (localStorage) y esquema listo para Supabase.
 
 ## Uso
 
@@ -15,27 +15,29 @@ npm run build    # compila a dist/
 
 - Los datos iniciales están en `src/data/` (un archivo por entidad: productos, ventas, cartera, salidas, pedidos, clientes, comerciales, proveedores, plantillas).
 - Las fechas son relativas al día de hoy, así que siempre hay cuentas vencidas, por vencer y ventas recientes.
-- Los cambios se guardan en `localStorage`. Para volver a los datos de ejemplo usa **"Restablecer datos de ejemplo"** al final del panel de Alertas.
+- Los cambios se guardan en `localStorage`. La app arranca vacía: la primera vez pide crear el administrador. Para borrar todo usa **"Borrar datos locales"** al final del panel de Alertas.
 
-## Estructura
+## Estructura (arquitectura por capas)
 
 ```
 src/
-  data/                datos simulados
-  types/               tipos del dominio
-  lib/                 utilidades puras: fechas, formato, cálculos financieros
-  store/               AppStore (datos + commit/toast) y UIStore (paneles y modales)
-  components/ui/       componentes genéricos (Button, DataTable, Drawer, Modal…)
-  components/layout/   TopBar, Sidebar, BottomNav, AppLayout, OverlayHost
-  features/<módulo>/
-    services/          lógica pura: recibe el estado y devuelve el nuevo
-    hooks/             datos derivados y acciones para los componentes
-    components/        UI del módulo
-  pages/               una página por ruta; solo compone componentes
+  domain/              entidades y reglas de negocio puras (precios, cuotas, abonos)
+  application/         puertos (interfaces de repositorio) y casos de uso
+  infrastructure/      Supabase (cliente, mappers, repositorios), datos demo, container
+  presentation/        React: páginas, componentes, features/<módulo>, stores
+  shared/              fechas, formato, constantes
+  config/              variables de entorno
+supabase/
+  migrations/          esquema SQL (MER) para Supabase
+  seed.sql             datos iniciales
+docs/
+  MER.md               diagrama entidad-relación y cómo ejecutarlo
+  ARQUITECTURA.md      capas, reglas de dependencia y plan de migración
 ```
 
-Flujo de datos: componente → hook → service → `commit()` del AppStore.
-Para conectar un backend real, reemplaza el `commit`/`localStorage` del AppStore por llamadas a la API dentro de los services.
+- Base de datos: ver [docs/MER.md](docs/MER.md).
+- Arquitectura y cómo conectar la UI a Supabase: ver [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md).
+- Configuración: copia `.env.example` como `.env.local`.
 
 ## Responsive
 
