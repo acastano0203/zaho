@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react'
-import { IconBag, IconBox, IconChart, IconContacts, IconCash, IconShield, IconTeam, IconTruck, IconWallet } from '../ui/Icons'
+import type { AppData } from '../../../domain/entities'
+import { porPedirCount } from '../../../domain/rules/finance'
+import { IconBag, IconBox, IconChart, IconContacts, IconCash, IconFactory, IconShield, IconTeam, IconTruck, IconWallet } from '../ui/Icons'
 
 export interface NavItem {
   to: string
@@ -10,6 +12,8 @@ export interface NavItem {
   perm: string
   /** false = no aparece en la barra inferior del celular (se llega desde la barra superior) */
   bottom?: boolean
+  /** Número que se muestra junto al módulo (0 = nada) */
+  badge?: (d: AppData) => number
 }
 
 export const NAV: NavItem[] = [
@@ -17,7 +21,8 @@ export const NAV: NavItem[] = [
   { to: '/clientes', label: 'Clientes', short: 'Clientes', icon: <IconContacts />, perm: 'clientes.ver' },
   { to: '/inventario', label: 'Inventario', short: 'Invent.', icon: <IconBox />, perm: 'inventario.ver' },
   { to: '/cartera', label: 'Cartera', short: 'Cartera', icon: <IconWallet />, perm: 'cartera.ver' },
-  { to: '/proveedores', label: 'Proveedores', short: 'Prov.', icon: <IconTruck />, perm: 'proveedores.ver' },
+  { to: '/pedidos', label: 'Pedidos', short: 'Pedidos', icon: <IconTruck />, perm: 'pedidos.ver', badge: porPedirCount },
+  { to: '/proveedores', label: 'Proveedores', short: 'Prov.', icon: <IconFactory />, perm: 'proveedores.ver' },
   { to: '/caja', label: 'Caja', short: 'Caja', icon: <IconCash />, perm: 'caja.ver' },
   { to: '/comerciales', label: 'Comerciales', short: 'Equipo', icon: <IconTeam />, perm: 'comerciales.ver' },
   { to: '/reportes', label: 'Reportes', short: 'Report.', icon: <IconChart />, perm: 'reportes.ver' },

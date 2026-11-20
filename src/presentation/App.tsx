@@ -15,6 +15,7 @@ import ClientesPage from './pages/ClientesPage'
 import InventarioPage from './pages/InventarioPage'
 import CarteraPage from './pages/CarteraPage'
 import ProveedoresPage from './pages/ProveedoresPage'
+import PedidosPage from './pages/PedidosPage'
 import CajaPage from './pages/CajaPage'
 import ComercialesPage from './pages/ComercialesPage'
 import ReportesPage from './pages/ReportesPage'
@@ -78,6 +79,7 @@ function LoggedIn() {
           <Route path="clientes" element={page('clientes.ver', <ClientesPage />)} />
           <Route path="inventario" element={page('inventario.ver', <InventarioPage />)} />
           <Route path="cartera" element={page('cartera.ver', <CarteraPage />)} />
+          <Route path="pedidos" element={page('pedidos.ver', <PedidosPage />)} />
           <Route path="proveedores" element={page('proveedores.ver', <ProveedoresPage />)} />
           <Route path="caja" element={page('caja.ver', <CajaPage />)} />
           <Route path="salidas" element={<Navigate to="/caja" replace />} />

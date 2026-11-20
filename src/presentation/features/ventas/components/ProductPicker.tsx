@@ -5,7 +5,7 @@ import { Chips } from '../../../components/ui/Chip'
 import { Dot } from '../../../components/ui/Display'
 import { Input, Label } from '../../../components/ui/Field'
 import { IconPlus } from '../../../components/ui/Icons'
-import { BRANDS, PROD_ST } from '../../../../shared/lib/constants'
+import { PROD_ST } from '../../../../shared/lib/constants'
 import { cop, norm } from '../../../../shared/lib/format'
 import { productStatus } from '../../../../domain/rules/finance'
 import type { PayMode, Product } from '../../../../domain/entities'
@@ -33,7 +33,7 @@ export function ProductPicker({ q, brand, pay, availableOf, onQ, onBrand, onAdd 
     <div className="flex flex-col gap-2">
       <Label>1 · Producto</Label>
       <Input placeholder="Buscar por nombre o código (ej. jean, ZH-B101)" value={q} onChange={e => onQ(e.target.value)} aria-label="Buscar producto" />
-      <Chips scroll value={brand} onChange={onBrand} options={[{ value: '', label: 'Todas' }, ...BRANDS.map(b => ({ value: b, label: b }))]} />
+      <Chips scroll value={brand} onChange={onBrand} options={[{ value: '', label: 'Todas' }, ...data.brands.map(b => ({ value: b.name, label: b.name }))]} />
       <Button size="sm" className="self-start" onClick={() => ui.openModal({ type: 'product', onCreated: p => { if (p.stock > 0) onAdd(p) } })}>
         <IconPlus size={14} />Crear producto nuevo
       </Button>

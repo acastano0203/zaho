@@ -47,36 +47,54 @@ export class SupabaseProducts implements ProductRepository {
   }
 }
 
+/** Una fila por referencia (la BD no admite la misma referencia dos veces en un pedido) */
+function itemsBySku(lines: OrderLine[]) {
+  const m = new Map<string, number>()
+  for (const l of lines) if (l.qty > 0) { const { skuId } = splitProductKey(l.pid); m.set(skuId, (m.get(skuId) ?? 0) + l.qty) }
+  return [...m].map(([producto_id, cantidad]) => ({ producto_id, cantidad }))
+}
+
 export class SupabaseOrders implements OrderRepository {
+  constructor(private catalog: SupabaseCatalog) {}
+
   private async idByCode(codigo: string) {
     const r = unwrap(await supabase().from('pedidos').select('id').eq('codigo', codigo).single()) as { id: string }
     return r.id
   }
 
   async list() {
-    const rows = unwrap(await supabase().from('pedidos')
-      .select('codigo, fecha, proveedor_id, bodega_destino_id, estado, automatico, pedido_items(producto_id, cantidad)')
-      .order('numero', { ascending: false })) as PedidoRow[]
-    return rows.map(toOrder)
+    const [rows, bodega] = await Promise.all([
+      supabase().from('pedidos')
+        .select('codigo, fecha, proveedor_id, bodega_destino_id, estado, automatico, pedido_items(producto_id, cantidad)')
+        .order('numero', { ascending: false }).then(unwrap) as Promise<PedidoRow[]>,
+      this.catalog.namer('bodegas'),
+    ])
+    return rows.map(r => ({ ...toOrder(r), wh: bodega(r.bodega_destino_id) }))
   }
 
-  async send(supplierId: string, lines: OrderLine[]) {
-    if (!lines.length) throw new Error('El pedido no tiene productos')
-    const bodega = splitProductKey(lines[0].pid).whId
+  async send(supplierId: string, lines: OrderLine[], warehouse: string) {
+    const items = itemsBySku(lines)
+    if (!items.length) throw new Error('El pedido no tiene productos')
+    const bodega = await this.catalog.idOf('bodegas', warehouse)
     const p = unwrap(await supabase().from('pedidos')
       .insert({ proveedor_id: supplierId, bodega_destino_id: bodega }).select('id, codigo').single()) as { id: string; codigo: string }
-    unwrap(await supabase().from('pedido_items').insert(lines.map(l => ({ pedido_id: p.id, producto_id: splitProductKey(l.pid).skuId, cantidad: l.qty }))))
+    unwrap(await supabase().from('pedido_items').insert(items.map(i => ({ pedido_id: p.id, ...i }))))
     return p.codigo
   }
 
   async updateLines(codigo: string, lines: OrderLine[]) {
     const id = await this.idByCode(codigo)
     unwrap(await supabase().from('pedido_items').delete().eq('pedido_id', id))
-    unwrap(await supabase().from('pedido_items').insert(lines.map(l => ({ pedido_id: id, producto_id: splitProductKey(l.pid).skuId, cantidad: l.qty }))))
+    unwrap(await supabase().from('pedido_items').insert(itemsBySku(lines).map(i => ({ pedido_id: id, ...i }))))
   }
 
   async advance(codigo: string) {
     unwrap(await supabase().rpc('avanzar_pedido', { p_pedido: await this.idByCode(codigo) }))
+  }
+
+  /** La BD suma lo recibido a la existencia de la bodega de llegada (stock + recibido) */
+  async receive(codigo: string, received: OrderLine[]) {
+    unwrap(await supabase().rpc('recibir_pedido', { p_pedido: await this.idByCode(codigo), p_items: itemsBySku(received) }))
   }
 
   async remove(codigo: string) {

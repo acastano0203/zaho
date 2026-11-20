@@ -20,6 +20,8 @@ interface Store {
   usuarios: Usuario[]
   /** userId → hash de la contraseña */
   claves: Record<string, string>
+  /** Ya se copiaron los permisos de proveedores a pedidos */
+  pedidosMigrado?: boolean
 }
 
 async function sha256(text: string) {
@@ -39,7 +41,7 @@ function seed(): Store {
       permisos: ['cartera.ver', 'cartera.crear', 'cartera.editar', 'clientes.ver', 'clientes.editar', 'ventas.ver'],
     },
   ]
-  return { roles, usuarios: [], claves: {} }
+  return { roles, usuarios: [], claves: {}, pedidosMigrado: true }
 }
 
 async function load(): Promise<Store> {
@@ -49,6 +51,12 @@ async function load(): Promise<Store> {
       const s = JSON.parse(raw) as Store
       // El módulo Salidas pasó a llamarse Caja
       s.roles = s.roles.map(r => ({ ...r, permisos: r.permisos.map(p => p.replace(/^salidas./, 'caja.')) }))
+      // Pedidos salió de Proveedores: quien tenía permisos de proveedores los recibe también en pedidos
+      if (!s.pedidosMigrado) {
+        s.roles = s.roles.map(r => ({ ...r, permisos: [...r.permisos, ...r.permisos.filter(p => p.startsWith('proveedores.')).map(p => p.replace('proveedores.', 'pedidos.'))] }))
+        s.pedidosMigrado = true
+        save(s)
+      }
       return s
     }
   } catch { /* sin almacenamiento */ }

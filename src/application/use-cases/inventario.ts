@@ -1,4 +1,4 @@
-import type { Product } from '../../domain/entities'
+import type { OrderLine, Product } from '../../domain/entities'
 import type { ProductCommand, Repositories } from '../ports/repositories'
 import { attempt, fail, type UseCaseResult } from './result'
 
@@ -17,3 +17,9 @@ export async function transferStock(r: Repositories, p: Product, toWarehouse: st
 }
 
 export const advanceOrder = (r: Repositories, orderId: string) => attempt(() => r.orders.advance(orderId), 'Pedido actualizado')
+
+/** Recibe el pedido con las cantidades que realmente llegaron y las suma al inventario */
+export async function receiveOrder(r: Repositories, orderId: string, received: OrderLine[]): Promise<UseCaseResult<void>> {
+  if (!received.some(l => l.qty > 0)) return fail('Indica cuántas unidades llegaron')
+  return attempt(() => r.orders.receive(orderId, received.filter(l => l.qty > 0)), 'Pedido ' + orderId + ' recibido')
+}

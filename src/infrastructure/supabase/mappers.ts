@@ -117,8 +117,13 @@ export const toComercial = (r: { id: string; nombre: string; telefono: string | 
   id: r.id, name: r.nombre, phone: r.telefono ?? '', pct: n(r.comision_pct),
 })
 
-export const toSupplier = (r: { id: string; nombre: string; contacto: string | null; whatsapp: string | null; pedido_automatico: boolean; proveedor_marcas: { marcas: { nombre: string } | null }[] }): Supplier => ({
-  id: r.id, name: r.nombre, contact: r.contacto ?? '', wa: r.whatsapp ?? '', auto: r.pedido_automatico,
+export const toSupplier = (r: {
+  id: string; nombre: string; contacto: string | null; whatsapp: string | null
+  tipo_documento: 'nit' | 'cc' | null; documento: string | null; email: string | null; direccion: string | null
+  proveedor_marcas: { marcas: { nombre: string } | null }[]
+}): Supplier => ({
+  id: r.id, name: r.nombre, contact: r.contacto ?? '', wa: r.whatsapp ?? '',
+  docType: r.tipo_documento ?? 'nit', doc: r.documento ?? '', email: r.email ?? '', address: r.direccion ?? '',
   brands: r.proveedor_marcas.map(m => m.marcas?.nombre).filter((x): x is string => !!x),
 })
 

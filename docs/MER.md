@@ -10,7 +10,13 @@ Datos iniciales: [`supabase/seed.sql`](../supabase/seed.sql)
 2. Nueva query → pega `supabase/migrations/20261117000002_eliminar_usuarios.sql` → **Run** (permite eliminar usuarios conservando su historial).
 3. Nueva query → pega `supabase/migrations/20261117000003_caja.sql` → **Run** (módulo de Caja: cuentas de dinero, libro de caja, traslados y arqueos; renombra el permiso Salidas → Caja).
 4. Nueva query → pega `supabase/migrations/20261117000004_sin_recargo_credito_y_mora.sql` → **Run** (quita el recargo por crédito y agrega el recargo por mora en cartera).
-4b. Nueva query → pega `seed.sql` → **Run** (solo configuración y catálogos; se puede repetir sin duplicar).
+4a. Nueva query → pega `supabase/migrations/20261120000005_marcas.sql` → **Run** (color de marca, permiso para crear marcas desde Proveedores y marcas iniciales Nike, Adidas y Calvin Klein).
+4b. Nueva query → pega `supabase/migrations/20261120000006_proveedores_datos.sql` → **Run** (NIT o cédula, correo y dirección del proveedor).
+4c. Nueva query → pega `supabase/migrations/20261120000007_sin_pedido_automatico.sql` → **Run** (retira el pedido automático a proveedores; el historial se conserva).
+4d. Nueva query → pega `supabase/migrations/20261120000008_modulo_pedidos.sql` → **Run** (módulo Pedidos con permisos propios; los roles con permisos de Proveedores los reciben también en Pedidos).
+4e. Nueva query → pega `supabase/migrations/20261120000009_categorias.sql` → **Run** (agrega la categoría Zapatos; las demás se crean desde la app).
+4f. Nueva query → pega `supabase/migrations/20261120000010_recibir_pedido.sql` → **Run** (recibir pedidos con las cantidades que realmente llegaron; suma al stock existente).
+4g. Nueva query → pega `seed.sql` → **Run** (solo configuración y catálogos; se puede repetir sin duplicar).
 5. **Authentication → Users → Add user**: crea tu usuario. El **primer** usuario queda como **Administrador**; los demás se crean desde la app (módulo Usuarios).
 6. Despliega la Edge Function que crea usuarios (requiere el CLI vinculado al proyecto, ver opción B): `npx supabase functions deploy admin-usuarios`.
 7. Recomendado: **Authentication → Providers → Email → desactiva "Allow new users to sign up"**. Aunque alguien se registre por su cuenta, su perfil queda inactivo y sin rol.
@@ -190,7 +196,7 @@ erDiagram
 | Tipo | Nombre | Qué hace |
 |---|---|---|
 | Trigger | `tg_movimiento_stock` | Aplica cada movimiento a `existencias`; el `CHECK stock >= 0` impide vender sin stock. |
-| Trigger | `tg_existencias_pedido_auto` | Si el stock cruza el mínimo y el proveedor está en automático, crea el pedido. |
+| Trigger | ~~`tg_existencias_pedido_auto`~~ | Retirado en la migración 7: ya no se crean pedidos automáticos. |
 | Trigger | `tg_auth_nuevo_usuario` | Crea el perfil: el primero es Administrador; los demás toman el rol de `app_metadata` (solo la service key lo escribe). |
 | Trigger | `tg_perfiles_admin`, `tg_perfiles_cambios`, `tg_roles_proteger` | Siempre queda un admin activo; nadie cambia su propio rol ni se desactiva; solo un admin asigna administradores; los roles de sistema no se borran. |
 | RPC | `mi_sesion()` | Perfil, rol y permisos efectivos del usuario conectado (para el front). |
@@ -220,6 +226,6 @@ erDiagram
 | Registrar venta / anular venta | `ventas.crear` / `ventas.eliminar` |
 | Abono, cuenta manual / plan de pagos | `cartera.crear` / `cartera.editar` |
 | Crear producto / ajustar o trasladar stock | `inventario.crear` / `inventario.editar` |
-| Confirmar o recibir pedido | `proveedores.editar` |
+| Confirmar o recibir pedido | `pedidos.editar` |
 | Gasto o préstamo | `salidas.crear` |
 | Crear usuario / editar usuario o rol / activar-desactivar | `usuarios.crear` / `usuarios.editar` / `usuarios.eliminar` |

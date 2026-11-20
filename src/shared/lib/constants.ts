@@ -3,9 +3,19 @@ import type { SalidaTipo } from '../../domain/entities'
 export const C = { ok: '#7A8B6F', warn: '#C29A4B', bad: '#A65A4A', stone: '#8A837C', ink: '#3E3A38' }
 
 
-export const BRANDS = ['Norte Denim', 'Bruma', 'Kalia', 'Sendero']
-export const CATS = ['Jeans', 'Blusas', 'Camisetas', 'Vestidos']
-export const SIZES = ['S', 'M', 'L', 'XL', '6', '8', '10', '12', '14']
+/** Marcas con las que arranca la tienda (se pueden crear más desde Proveedores → Marcas) */
+export const DEFAULT_BRANDS = [
+  { name: 'Nike', color: '#2B2826' },
+  { name: 'Adidas', color: '#4A5A72' },
+  { name: 'Calvin Klein', color: '#8A837C' },
+]
+/** Acentos disponibles para la tarjeta de una marca */
+export const BRAND_COLORS = ['#2B2826', '#4A5A72', '#8A837C', '#A65A4A', '#7A8B6F', '#C29A4B', '#6B5B73', '#9AA9BC']
+/** Categorías con las que arranca la tienda (se crean más desde Inventario) */
+export const DEFAULT_CATS = ['Jeans', 'Blusas', 'Camisetas', 'Vestidos', 'Zapatos']
+/** Tallas sugeridas de ropa y calzado. Se puede escribir cualquier otra. */
+export const SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '6', '8', '10', '12', '14', '16']
+export const SHOE_SIZES = ['34', '35', '36', '37', '38', '39', '40', '41', '42', '43', '44', '45']
 export const WAREHOUSES = ['Bodega Principal', 'Local ZAHO']
 export const METODOS = ['Efectivo', 'Nequi', 'Bancolombia', 'Transferencia', 'Tarjeta']
 /** Ciudades principales de Colombia (formulario de clientes) */

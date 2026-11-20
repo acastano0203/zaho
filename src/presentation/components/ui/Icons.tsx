@@ -31,6 +31,7 @@ export const IconContacts = (p: P) => <Base {...p}><rect x="3" y="5" width="18" 
 export const IconBox = (p: P) => <Base {...p}><path d="M3 7.5 12 3l9 4.5v9L12 21l-9-4.5z" /><path d="M3 7.5 12 12l9-4.5M12 12v9" /></Base>
 export const IconWallet = (p: P) => <Base {...p}><rect x="3" y="6" width="18" height="13" rx="2" /><path d="M3 10h18M16 15h2" /></Base>
 export const IconTruck = (p: P) => <Base {...p}><path d="M3 6h11v10H3zM14 9h4l3 3v4h-7" /><circle cx="7" cy="17.5" r="1.8" /><circle cx="17" cy="17.5" r="1.8" /></Base>
+export const IconFactory = (p: P) => <Base {...p}><path d="M3 20V10l5 3V10l5 3V6h3l1 14z" /><path d="M3 20h18M17 20V4h3v16" /></Base>
 export const IconOut = (p: P) => <Base {...p}><path d="M12 3v12M7 10l5 5 5-5" /><path d="M4 19h16" /></Base>
 export const IconTeam = (p: P) => <Base {...p}><circle cx="9" cy="8" r="3.2" /><path d="M3 20c.6-3.4 3-5.5 6-5.5s5.4 2.1 6 5.5" /><circle cx="17" cy="9" r="2.4" /><path d="M16.5 14.6c2.3.3 3.9 2 4.5 4.9" /></Base>
 export const IconChart = (p: P) => <Base {...p}><path d="M4 20V4M4 20h16" /><path d="M8 16v-4M12 16V8M16 16v-6M20 16V6" /></Base>

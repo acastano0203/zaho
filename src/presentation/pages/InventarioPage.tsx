@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useUI } from '../store/UIStore'
+import { useSession } from '../store/SessionStore'
 import { PageHeader } from '../components/ui/PageHeader'
 import { Button } from '../components/ui/Button'
 import { Empty } from '../components/ui/Display'
@@ -12,6 +13,7 @@ import { emptyFilters, useInventoryList } from '../features/inventario/hooks/use
 
 export default function InventarioPage() {
   const ui = useUI()
+  const { can } = useSession()
   const [view, setView] = useState<'prod' | 'bod'>('prod')
   const [f, setF] = useState(emptyFilters)
   const { list, summary, bodegas } = useInventoryList(f)
@@ -22,6 +24,7 @@ export default function InventarioPage() {
         actions={
           <>
             <Segmented full label="Vista de inventario" value={view} onChange={setView} options={[{ value: 'prod', label: 'Productos' }, { value: 'bod', label: 'Bodegas' }]} />
+            {can('inventario.ver') && <Button onClick={() => ui.openModal({ type: 'categories' })}>Categorías</Button>}
             <Button onClick={() => ui.openModal({ type: 'adjust' })}><IconAdjust size={16} />Ajustar stock</Button>
             <Button onClick={() => ui.openModal({ type: 'transfer' })}><IconTransfer size={16} />Trasladar</Button>
             <Button variant="dark" onClick={() => ui.openModal({ type: 'product' })}><IconPlus size={16} />Crear producto</Button>

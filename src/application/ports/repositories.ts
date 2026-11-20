@@ -9,7 +9,7 @@
  *                         infrastructure → application (implementa puertos) → domain
  */
 import type {
-  AppData, CierreCaja, Cliente, Comercial, Cuota, CuentaDinero, Freq, MovCaja, OrderLine, PayMode, Product, SaleItem, Salida, SalidaTipo, Supplier, TemplateKey,
+  AppData, Brand, Category, CierreCaja, Cliente, Comercial, Cuota, CuentaDinero, Freq, MovCaja, OrderLine, PayMode, Product, SaleItem, Salida, SalidaTipo, Supplier, TemplateKey,
 } from '../../domain/entities'
 
 /* ------------------------------ Comandos ------------------------------ */
@@ -127,6 +127,18 @@ export interface ComercialRepository {
   remove(id: string): Promise<void>
 }
 
+export interface CategoryRepository {
+  list(): Promise<Category[]>
+  save(c: Omit<Category, 'id'> & { id?: string }): Promise<string>
+  remove(id: string): Promise<void>
+}
+
+export interface BrandRepository {
+  list(): Promise<Brand[]>
+  save(b: Omit<Brand, 'id'> & { id?: string }): Promise<string>
+  remove(id: string): Promise<void>
+}
+
 export interface SupplierRepository {
   list(): Promise<Supplier[]>
   save(s: Omit<Supplier, 'id'> & { id?: string }): Promise<string>
@@ -135,9 +147,13 @@ export interface SupplierRepository {
 
 export interface OrderRepository {
   list(): Promise<AppData['orders']>
-  send(supplierId: string, lines: OrderLine[]): Promise<string>
+  /** `warehouse`: nombre de la bodega a la que llega */
+  send(supplierId: string, lines: OrderLine[], warehouse: string): Promise<string>
   updateLines(orderId: string, lines: OrderLine[]): Promise<void>
+  /** Enviado → Confirmado */
   advance(orderId: string): Promise<void>
+  /** Marca recibido y suma al stock de la bodega de llegada las cantidades que llegaron */
+  receive(orderId: string, received: OrderLine[]): Promise<void>
   remove(orderId: string): Promise<void>
 }
 
@@ -175,6 +191,8 @@ export interface Repositories {
   clients: ClientRepository
   comerciales: ComercialRepository
   suppliers: SupplierRepository
+  brands: BrandRepository
+  categories: CategoryRepository
   orders: OrderRepository
   settings: SettingsRepository
 }

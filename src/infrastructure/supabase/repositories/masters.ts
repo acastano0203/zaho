@@ -50,12 +50,15 @@ export class SupabaseSuppliers implements SupplierRepository {
 
   async list() {
     const rows = unwrap(await supabase().from('proveedores')
-      .select('id, nombre, contacto, whatsapp, pedido_automatico, proveedor_marcas(marcas(nombre))').eq('activo', true).order('nombre'))
+      .select('id, nombre, contacto, whatsapp, tipo_documento, documento, email, direccion, proveedor_marcas(marcas(nombre))').eq('activo', true).order('nombre'))
     return (rows as unknown as Parameters<typeof toSupplier>[0][]).map(toSupplier)
   }
 
   async save(s: Omit<Supplier, 'id'> & { id?: string }) {
-    const row = { nombre: s.name.trim(), contacto: s.contact || null, whatsapp: s.wa || null, pedido_automatico: s.auto }
+    const row = {
+      nombre: s.name.trim(), contacto: s.contact || null, whatsapp: s.wa || null,
+      tipo_documento: s.doc ? s.docType ?? 'nit' : null, documento: s.doc || null, email: s.email || null, direccion: s.address || null,
+    }
     const id = s.id
       ? (unwrap(await supabase().from('proveedores').update(row).eq('id', s.id)), s.id)
       : (unwrap(await supabase().from('proveedores').insert(row).select('id').single()) as { id: string }).id

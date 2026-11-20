@@ -1,18 +1,22 @@
 import { useUI } from '../../store/UIStore'
 import { SaleDrawer } from '../../features/ventas/components/SaleDrawer'
 import { SaleDetailDrawer } from '../../features/ventas/components/SaleDetailDrawer'
+import { ProductDrawer } from '../../features/inventario/components/ProductDrawer'
 import { ClientDrawer } from '../../features/clientes/components/ClientDrawer'
 import { ClientFormModal } from '../../features/clientes/components/ClientFormModal'
 import { CarteraDrawer } from '../../features/cartera/components/CarteraDrawer'
 import { WhatsAppModal } from '../../features/cartera/components/WhatsAppModal'
 import { SalidaDrawer } from '../../features/salidas/components/SalidaDrawer'
-import { OrderModal } from '../../features/proveedores/components/OrderModal'
+import { OrderModal } from '../../features/pedidos/components/OrderModal'
 import { ProductModal } from '../../features/inventario/components/ProductModal'
 import { AdjustModal } from '../../features/inventario/components/AdjustModal'
 import { TransferModal } from '../../features/inventario/components/TransferModal'
 import { ComercialModal } from '../../features/comerciales/components/ComercialModal'
 import { SupplierModal } from '../../features/proveedores/components/SupplierModal'
-import { OrderEditModal } from '../../features/proveedores/components/OrderEditModal'
+import { CategoriesModal } from '../../features/inventario/components/CategoriesModal'
+import { ReceiveModal } from '../../features/pedidos/components/ReceiveModal'
+import { BrandModal } from '../../features/proveedores/components/BrandModal'
+import { OrderEditModal } from '../../features/pedidos/components/OrderEditModal'
 import { SalidaEditModal } from '../../features/salidas/components/SalidaEditModal'
 import { CarteraEditModal } from '../../features/cartera/components/CarteraEditModal'
 import { UserModal } from '../../features/usuarios/components/UserModal'
@@ -29,12 +33,13 @@ import { ConfirmModal } from '../ui/ConfirmModal'
 export function OverlayHost() {
   const { drawer: d, modal: m } = useUI()
   const dk = d ? JSON.stringify(d) : ''
-  const mk = m ? m.type + ('id' in m ? m.id : '') + ('pid' in m ? m.pid : '') + ('cid' in m ? m.cid : '') + ('cids' in m ? m.cids.join(',') : '') + ('sup' in m ? m.sup : '') : ''
+  const mk = m ? m.type + ('id' in m ? m.id : '') + ('pid' in m ? m.pid : '') + ('cid' in m ? m.cid : '') + ('cids' in m ? m.cids.join(',') : '') + ('sup' in m ? m.sup ?? '' : '') : ''
 
   return (
     <>
       {d?.type === 'sale' && <SaleDrawer key={dk} editId={d.editId} clientId={d.clientId} />}
       {d?.type === 'saleDetail' && <SaleDetailDrawer key={dk} id={d.id} />}
+      {d?.type === 'product' && <ProductDrawer key={dk} id={d.id} />}
       {d?.type === 'client' && <ClientDrawer key={dk} id={d.id} />}
       {d?.type === 'cartera' && <CarteraDrawer key={dk} cid={d.cid} sec={d.sec} />}
       {d?.type === 'salida' && <SalidaDrawer key={dk} kind={d.kind} origin={d.origin} />}
@@ -47,6 +52,9 @@ export function OverlayHost() {
       {m?.type === 'clientForm' && <ClientFormModal key={mk} id={m.id} />}
       {m?.type === 'comercial' && <ComercialModal key={mk} id={m.id} />}
       {m?.type === 'supplier' && <SupplierModal key={mk} id={m.id} />}
+      {m?.type === 'categories' && <CategoriesModal key={mk} />}
+      {m?.type === 'brand' && <BrandModal key={mk} id={m.id} />}
+      {m?.type === 'receive' && <ReceiveModal key={mk} id={m.id} />}
       {m?.type === 'orderEdit' && <OrderEditModal key={mk} id={m.id} />}
       {m?.type === 'salidaEdit' && <SalidaEditModal key={mk} id={m.id} />}
       {m?.type === 'carteraEdit' && <CarteraEditModal key={mk} cid={m.cid} />}

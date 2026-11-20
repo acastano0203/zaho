@@ -8,17 +8,21 @@ export type DrawerState =
   | { type: 'sale'; editId?: string; clientId?: string }
   | { type: 'saleDetail'; id: string }
   | { type: 'client'; id: string }
+  | { type: 'product'; id: string }
   | { type: 'cartera'; cid: string; sec?: CarSec }
   | { type: 'salida'; kind: SalidaKind; origin: 'salidas' | 'cartera' }
   | null
 
 export type ModalState =
   | { type: 'wa'; cid: string; tpl?: TemplateKey }
-  | { type: 'order'; sup: string; firstPid?: string }
+  | { type: 'order'; sup?: string; firstPid?: string }
   | { type: 'product'; id?: string; onCreated?: (p: Product) => void }
   | { type: 'confirm'; title: string; message: string; cta?: string; onConfirm: () => boolean | void }
   | { type: 'supplier'; id?: string }
+  | { type: 'brand'; id?: string }
+  | { type: 'categories' }
   | { type: 'orderEdit'; id: string }
+  | { type: 'receive'; id: string }
   | { type: 'salidaEdit'; id: string }
   | { type: 'carteraEdit'; cid: string }
   | { type: 'adjust'; pid?: string }

@@ -17,10 +17,10 @@ insert into public.plantillas_mensaje (clave, texto) values
 on conflict (clave) do nothing;
 
 -- Catálogos ----------------------------------------------------------
-insert into public.marcas (nombre) values ('Norte Denim'), ('Bruma'), ('Kalia'), ('Sendero')
+insert into public.marcas (nombre, color) values ('Nike', '#2B2826'), ('Adidas', '#4A5A72'), ('Calvin Klein', '#8A837C')
 on conflict (nombre) do nothing;
 
-insert into public.categorias (nombre) values ('Jeans'), ('Blusas'), ('Camisetas'), ('Vestidos')
+insert into public.categorias (nombre) values ('Jeans'), ('Blusas'), ('Camisetas'), ('Vestidos'), ('Zapatos')
 on conflict (nombre) do nothing;
 
 insert into public.bodegas (nombre, es_punto_venta) values ('Bodega Principal', false), ('Local ZAHO', true)

@@ -50,10 +50,24 @@ function load(): AppData {
       const d = JSON.parse(raw) as AppData
       // Datos guardados antes de existir la Caja
       const s = seedData()
-      return { ...d, cuentas: d.cuentas ?? s.cuentas, movCaja: d.movCaja ?? [], cierres: d.cierres ?? [] }
+      return { ...d, cuentas: d.cuentas ?? s.cuentas, movCaja: d.movCaja ?? [], cierres: d.cierres ?? [], brands: d.brands ?? legacyBrands(d, s.brands), categories: d.categories ?? legacyCategories(d, s.categories) }
     }
   } catch { /* sin almacenamiento */ }
   return seedData()
+}
+
+/** Datos guardados antes de existir las marcas: las por defecto más las que ya usan productos y proveedores */
+function legacyBrands(d: AppData, defaults: AppData['brands']): AppData['brands'] {
+  const names = new Set(defaults.map(b => b.name))
+  const extra = [...(d.products ?? []).map(p => p.brand), ...(d.suppliers ?? []).flatMap(s => s.brands)].filter(n => n && !names.has(n) && names.add(n))
+  return [...defaults, ...extra.map((name, i) => ({ id: 'bl' + i, name, color: '#8A837C' }))]
+}
+
+/** Datos guardados antes de poder crear categorías: las por defecto más las que ya usan los productos */
+function legacyCategories(d: AppData, defaults: AppData['categories']): AppData['categories'] {
+  const names = new Set(defaults.map(c => c.name))
+  const extra = (d.products ?? []).map(p => p.cat).filter(n => n && !names.has(n) && names.add(n))
+  return [...defaults, ...extra.map((name, i) => ({ id: 'cl' + i, name }))]
 }
 
 const errMsg = (e: unknown) => (e instanceof Error ? e.message : String(e))

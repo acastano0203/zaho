@@ -2,6 +2,7 @@ import type { AppData, CarRow, CarSt, CarteraEntry, CarteraKind, Cuota, CuotaCal
 import { C } from '../../shared/lib/constants'
 import { addDays, addMonths, diff, fd, fl, today, wd } from '../../shared/lib/dates'
 import { cop, firstName } from '../../shared/lib/format'
+import { skuInOpenOrder } from './pedidos'
 
 /* ---------- precios y ventas ---------- */
 /** La venta a crédito cuesta lo mismo que de contado: no hay recargo por crédito.
@@ -21,33 +22,14 @@ export const productStatus = (p: Product): ProdSt => (p.stock <= 0 ? 'ago' : p.s
 export const suggestQty = (p: Product) => Math.max(p.min * 2 - p.stock, 1)
 export const supplierOf = (d: AppData, p: Product) => d.suppliers.find(s => s.brands.includes(p.brand))
 export const openOrders = (orders: Order[]) => orders.filter(o => o.status !== 'Recibido')
-export const inOpenOrder = (orders: Order[], pid: string) => openOrders(orders).some(o => o.lines.some(l => l.pid === pid))
+/** Referencias bajo el mínimo y sin pedido en camino (lo que hay por pedir) */
+export const porPedirCount = (d: AppData) => d.products.filter(p => p.stock < p.min && !skuInOpenOrder(d, p)).length
 export const suggestionsFor = (d: AppData, supId: string) => {
   const sup = d.suppliers.find(x => x.id === supId)
   if (!sup) return []
   return d.products
-    .filter(p => sup.brands.includes(p.brand) && p.stock < p.min && !inOpenOrder(d.orders, p.id))
+    .filter(p => sup.brands.includes(p.brand) && p.stock < p.min && !skuInOpenOrder(d, p))
     .sort((a, b) => a.stock - b.stock)
-}
-
-/** Si un producto cruza el mínimo y su proveedor está en automático, genera el pedido */
-export function autoOrders(d: AppData, oldP: Product[], newP: Product[]): { orders: Order[]; seq: Seq; msg: string } {
-  let msg = ''
-  let out = d.orders.slice()
-  let n = d.seq.order
-  newP.forEach(p => {
-    const o = oldP.find(x => x.id === p.id)
-    if (!o) return
-    const crossed = p.stock < p.min && (o.stock >= o.min || (p.stock <= 0 && o.stock > 0))
-    if (!crossed) return
-    const sup = d.suppliers.find(x => x.brands.includes(p.brand))
-    if (!sup || !sup.auto) return
-    if (out.some(x => x.status !== 'Recibido' && x.lines.some(l => l.pid === p.id))) return
-    n += 1
-    out = [{ id: 'O-' + n, date: today(), sup: sup.id, lines: [{ pid: p.id, qty: suggestQty(p) }], status: 'Enviado' as const, auto: true }, ...out]
-    msg = 'Pedido automático enviado a ' + sup.name + ': ' + p.name + ' talla ' + p.size
-  })
-  return { orders: out, seq: { ...d.seq, order: n }, msg }
 }
 
 /* ---------- planes y cuotas ---------- */

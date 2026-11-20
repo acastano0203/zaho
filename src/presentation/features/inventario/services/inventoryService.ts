@@ -1,12 +1,14 @@
 import type { AppData, Product } from '../../../../domain/entities'
 import type { Result } from '../../../store/AppStore'
 import { num } from '../../../../shared/lib/format'
-import { autoOrders } from '../../../../domain/rules/finance'
 
 export interface ProductForm { code: string; brand: string; name: string; cat: string; size: string; color: string; wh: string; stock: string; min: string; cost: string; price: string }
 
 export function createProduct(d: AppData, f: ProductForm): Result & { product?: Product } {
   if (!f.name.trim() || !num(f.price)) return { data: d, error: 'Nombre y precio son obligatorios' }
+  if (!f.brand) return { data: d, error: 'Elige la marca (créala en Proveedores → Marcas)' }
+  if (!f.cat) return { data: d, error: 'Elige la categoría' }
+  if (!f.size.trim()) return { data: d, error: 'Escribe la talla' }
   const n = d.seq.prod + 1
   const product: Product = {
     id: 'p' + n, code: f.code.trim() || 'ZH-' + n, brand: f.brand, name: f.name.trim(), cat: f.cat, size: f.size,
@@ -17,12 +19,14 @@ export function createProduct(d: AppData, f: ProductForm): Result & { product?: 
 
 export function updateProduct(d: AppData, id: string, f: ProductForm): Result {
   if (!f.name.trim() || !num(f.price)) return { data: d, error: 'Nombre y precio son obligatorios' }
+  if (!f.brand) return { data: d, error: 'Elige la marca (créala en Proveedores → Marcas)' }
+  if (!f.cat) return { data: d, error: 'Elige la categoría' }
+  if (!f.size.trim()) return { data: d, error: 'Escribe la talla' }
   const products = d.products.map(p => p.id === id ? {
     ...p, code: f.code.trim() || p.code, brand: f.brand, name: f.name.trim(), cat: f.cat, size: f.size, color: f.color.trim() || '—',
     wh: f.wh, stock: num(f.stock), min: num(f.min), cost: num(f.cost), price: num(f.price),
   } : p)
-  const a = autoOrders(d, d.products, products)
-  return { data: { ...d, products, orders: a.orders, seq: a.seq }, msg: a.msg || 'Producto ' + (f.code || '') + ' actualizado' }
+  return { data: { ...d, products }, msg: 'Producto ' + (f.code || '') + ' actualizado' }
 }
 
 /** Solo se elimina si no aparece en ventas ni en pedidos en curso */
@@ -44,10 +48,9 @@ export function adjustStock(d: AppData, pid: string | undefined, qtyRaw: string,
   const p = d.products.find(x => x.id === pid)!
   const qty = num(qtyRaw)
   const products = d.products.map(x => (x.id === pid ? { ...x, stock: qty } : x))
-  const a = autoOrders(d, d.products, products)
   return {
-    data: { ...d, products, orders: a.orders, seq: a.seq },
-    msg: a.msg || 'Stock de ' + p.name + ' T' + p.size + ': ' + p.stock + ' → ' + qty + ' (' + motivo + ')',
+    data: { ...d, products },
+    msg: 'Stock de ' + p.name + ' T' + p.size + ': ' + p.stock + ' → ' + qty + ' (' + motivo + ')',
   }
 }
 

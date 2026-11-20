@@ -102,11 +102,24 @@ export interface Salida {
 
 export type OrderStatus = 'Enviado' | 'Confirmado' | 'Recibido'
 export interface OrderLine { pid: string; qty: number }
-export interface Order { id: string; date: string; sup: string; lines: OrderLine[]; status: OrderStatus; auto: boolean }
+export interface Order {
+  id: string; date: string; sup: string; lines: OrderLine[]; status: OrderStatus; auto: boolean
+  /** Bodega a la que llega (y donde se suma el stock al recibir) */
+  wh?: string
+}
 
 export interface Cliente { id: string; name: string; phone: string; doc: string; city: string; note: string; created: string }
 export interface Comercial { id: string; name: string; phone: string; pct: number }
-export interface Supplier { id: string; name: string; brands: string[]; contact: string; wa: string; auto: boolean }
+/** Categoría de producto (Jeans, Zapatos…) */
+export interface Category { id: string; name: string }
+/** Marca que vende la tienda. `color` es el acento de su tarjeta. */
+export interface Brand { id: string; name: string; color: string }
+export type DocTipo = 'nit' | 'cc'
+export interface Supplier {
+  id: string; name: string; brands: string[]; contact: string; wa: string
+  /** Identificación tributaria: NIT (sin dígito de verificación) o cédula */
+  docType?: DocTipo; doc?: string; email?: string; address?: string
+}
 
 export type TemplateKey = 'recordatorio' | 'vencida' | 'gracias' | 'prestamo'
 export type Templates = Record<TemplateKey, string>
@@ -122,6 +135,8 @@ export interface AppData {
   clientes: Cliente[]
   comerciales: Comercial[]
   suppliers: Supplier[]
+  brands: Brand[]
+  categories: Category[]
   tpls: Templates
   seq: Seq
   daily: boolean

@@ -2,7 +2,7 @@ import type { AppData, CarteraEntry, Cliente, Freq, PayMode, SaleItem } from '..
 import type { Result } from '../../../store/AppStore'
 import { fl, today } from '../../../../shared/lib/dates'
 import { cop, norm, num } from '../../../../shared/lib/format'
-import { autoOrders, planPreview, saleTotal } from '../../../../domain/rules/finance'
+import { planPreview, saleTotal } from '../../../../domain/rules/finance'
 
 export interface SaleDraft {
   id: string | null
@@ -75,9 +75,7 @@ export function saveSale(d: AppData, draft: SaleDraft): Result {
   }
 
   const products = applyStock(d, orig ? orig.items : [], draft.items)
-  const a = autoOrders(d, d.products, products)
-  const base: AppData = { ...d, products, orders: a.orders, seq: a.seq }
-  const extra = a.msg ? ' · ' + a.msg : ''
+  const base: AppData = { ...d, products }
 
   if (orig) {
     const sales = d.sales.map(x => x.id === orig.id ? { ...x, client, clientId: draft.clientId, phone: draft.phone, com: draft.com, pay: draft.pay, met: draft.pay === 'contado' ? draft.met : undefined, items: draft.items } : x)
@@ -87,7 +85,7 @@ export function saveSale(d: AppData, draft: SaleDraft): Result {
     else if (draft.pay === 'credito')
       cartera = cartera.map(c => c.saleId === orig.id ? { ...c, client, clientId: draft.clientId, phone: draft.phone, com: draft.com, ...(c.plan && c.plan.length ? {} : { due: draft.due }) } : c)
     else cartera = cartera.filter(c => c.saleId !== orig.id)
-    return { data: { ...base, sales, cartera }, msg: 'Venta ' + orig.id + ' actualizada' + extra }
+    return { data: { ...base, sales, cartera }, msg: 'Venta ' + orig.id + ' actualizada' }
   }
 
   const n = d.seq.sale + 1
@@ -96,7 +94,7 @@ export function saveSale(d: AppData, draft: SaleDraft): Result {
   const cartera = draft.pay === 'credito' ? d.cartera.concat([newCredit(id, client, draft, saleTotal(sale))]) : d.cartera
   return {
     data: { ...base, sales: [sale, ...d.sales], cartera, seq: { ...base.seq, sale: n } },
-    msg: 'Venta ' + id + ' registrada · ' + cop(saleTotal(sale)) + (draft.pay === 'credito' ? ' · creada en Cartera' : '') + extra,
+    msg: 'Venta ' + id + ' registrada · ' + cop(saleTotal(sale)) + (draft.pay === 'credito' ? ' · creada en Cartera' : ''),
   }
 }
 

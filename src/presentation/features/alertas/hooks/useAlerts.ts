@@ -5,7 +5,8 @@ import { useNavigate } from 'react-router-dom'
 import { C } from '../../../../shared/lib/constants'
 import { fd } from '../../../../shared/lib/dates'
 import { cop, firstName } from '../../../../shared/lib/format'
-import { dueText, inOpenOrder, supplierOf } from '../../../../domain/rules/finance'
+import { dueText, supplierOf } from '../../../../domain/rules/finance'
+import { skuInOpenOrder } from '../../../../domain/rules/pedidos'
 
 export interface AlertItem { key: string; u: number; text: string; sub: string; color: string; btn: string; isWa: boolean; act: () => void }
 
@@ -20,11 +21,11 @@ export function useAlerts(): AlertItem[] {
         color: r.st === 'ven' ? C.bad : C.warn, btn: 'Cobrar por WhatsApp', isWa: true, act: () => ui.openModal({ type: 'wa', cid: r.c.id }) })
     })
     data.products.filter(p => p.stock < p.min).forEach(p => {
-      const ago = p.stock <= 0, sup = supplierOf(data, p), busy = inOpenOrder(data.orders, p.id)
+      const ago = p.stock <= 0, sup = supplierOf(data, p), busy = skuInOpenOrder(data, p)
       al.push({ key: 'p' + p.id, u: ago ? 1.5 : 2.5, text: p.name + ' talla ' + p.size + (ago ? ' agotado' : ' quedan ' + p.stock),
         sub: p.brand + ' · ' + p.wh + (busy ? ' · pedido en curso' : ''), color: ago ? C.bad : C.warn,
         btn: busy ? 'Ver pedido' : 'Pedir al proveedor', isWa: !busy,
-        act: busy || !sup ? () => { ui.setAlertsOpen(false); nav('/proveedores') } : () => ui.openModal({ type: 'order', sup: sup.id, firstPid: p.id }) })
+        act: busy || !sup ? () => { ui.setAlertsOpen(false); nav('/pedidos') } : () => ui.openModal({ type: 'order', sup: sup.id, firstPid: p.id }) })
     })
     carRows.filter(r => r.saldo > 0 && r.c.kind === 'prestamo' && r.days <= 7).forEach(r => {
       al.push({ key: 'l' + r.c.id, u: r.days < 0 ? r.days : 3 + r.days / 10, text: 'Préstamo a ' + firstName(r.c.client) + ' ' + dueText(r.days, r.refDue) + ': ' + cop(r.saldo),
